@@ -51,9 +51,10 @@ void FacePredict::Train(const std::vector<AAM_Shape> &AllShapes,
 {
     if(AllShapes.size() != AllImages.size())
     {
-        fprintf(stderr, "ERROE(%s, %d): #Shapes != #Images\n",
-                __FILE__, __LINE__);
-        exit(0);
+        //fprintf(stderr, "ERROE(%s, %d): #Shapes != #Images\n", __FILE__, __LINE__);
+        //exit(0);
+        AgingException ex(3);
+        throw ex;
     }
 
     CvMat* Points;
@@ -98,16 +99,18 @@ IplImage* FacePredict::predict(const AAM_Shape& shape, const IplImage& curImage,
 {
     if (newAgeG > NGROUPS || curAgeG > NGROUPS)
     {
-        fprintf(stderr, "ERROE(%s, %d): Age group larger than %d\n",
-                __FILE__, __LINE__, NGROUPS);
-        exit(0);
+        //fprintf(stderr, "ERROE(%s, %d): Age group larger than %d\n", __FILE__, __LINE__, NGROUPS);
+        //exit(0);
+        AgingException ex(6);
+        throw ex;
     }
 
     if(curImage.nChannels != 3 || curImage.depth != 8)
     {
-        fprintf(stderr, "ERROR(%s: %d): The image channels must be 3, "
-                "and the depth must be 8!\n", __FILE__, __LINE__);
-        exit(0);
+        //fprintf(stderr, "ERROR(%s: %d): The image channels must be 3, and the depth must be 8!\n", __FILE__, __LINE__);
+        //exit(0);
+        AgingException ex(6);
+        throw ex;
     }
 
     //get the current shape parameters
@@ -192,16 +195,18 @@ IplImage* FacePredict::predict(const AAM_Shape& Shape, const IplImage& curImage,
 {
     if (newAgeG > NGROUPS || curAgeG > NGROUPS)
     {
-        fprintf(stderr, "ERROE(%s, %d): Age group larger than %d\n",
-                __FILE__, __LINE__, NGROUPS);
-        exit(0);
+        //fprintf(stderr, "ERROE(%s, %d): Age group larger than %d\n", __FILE__, __LINE__, NGROUPS);
+        //exit(0);
+        AgingException ex(6);
+        throw ex;
     }
 
     if(curImage.nChannels != 3 || curImage.depth != 8)
     {
-        fprintf(stderr, "ERROR(%s: %d): The image channels must be 3, "
-                "and the depth must be 8!\n", __FILE__, __LINE__);
-        exit(0);
+        //fprintf(stderr, "ERROR(%s: %d): The image channels must be 3, and the depth must be 8!\n", __FILE__, __LINE__);
+        //exit(0);
+        AgingException ex(7);
+        throw ex;
     }
 
 

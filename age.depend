@@ -29,7 +29,7 @@
 	<opencv/cvaux.h>
 	"AAM_Config.h"
 
-1422173883 /home/wuxuef/myproject/age/AAM_Config.h
+1422672426 /home/wuxuef/myproject/age/AAM_Config.h
 
 1422174524 /home/wuxuef/myproject/age/AAM_TDM.h
 	"AAM_Util.h"
@@ -102,7 +102,7 @@
 1422174579 /home/wuxuef/myproject/age/AAM_VJFaceDetect.h
 	"AAM_Shape.h"
 
-1422174607 source:/home/wuxuef/myproject/age/FacePredict.cpp
+1422691547 source:/home/wuxuef/myproject/age/FacePredict.cpp
 	"FacePredict.h"
 
 1422174629 /home/wuxuef/myproject/age/FacePredict.h
@@ -110,7 +110,7 @@
 	"AAM_PDM.h"
 	"AAM_TDM.h"
 
-1422174663 source:/home/wuxuef/myproject/age/fit.cpp
+1422691636 source:/home/wuxuef/myproject/age/fit.cpp
 	<cstdio>
 	<string>
 	<opencv/highgui.h>

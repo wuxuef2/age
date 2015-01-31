@@ -24,56 +24,51 @@ private:
 
 public:
     // Constructors and Destructor
-    AAM_Shape()
-    {
+    AAM_Shape() {
         resize(0);
     }
+
     AAM_Shape(const AAM_Shape &v);
-    ~AAM_Shape()
-    {
+    ~AAM_Shape() {
         clear();
     }
 
     //access elements
-    const CvPoint2D32f operator[] (int i)const
-    {
-        return m_vPoint[i];
-    }
-    CvPoint2D32f& operator[] (int i)
-    {
+    const CvPoint2D32f operator[] (int i)const {
         return m_vPoint[i];
     }
 
-    inline const int NPoints()const
-    {
+    CvPoint2D32f& operator[] (int i) {
+        return m_vPoint[i];
+    }
+
+    inline const int NPoints()const {
         return	m_vPoint.size();
     }
 
     // operators
-    AAM_Shape&    operator=(const AAM_Shape &s);
-    AAM_Shape&    operator=(double value);
-    AAM_Shape     operator+(const AAM_Shape &s);
-    AAM_Shape&    operator+=(const AAM_Shape &s);
-    AAM_Shape     operator-(const AAM_Shape &s);
-    AAM_Shape&    operator-=(const AAM_Shape &s);
-    AAM_Shape     operator*(double value);
-    AAM_Shape&    operator*=(double value);
-    double         operator*(const AAM_Shape &s);
-    AAM_Shape     operator/(double value);
-    AAM_Shape&    operator/=(double value);
-    bool		   operator==(double value);
+    AAM_Shape& operator=(const AAM_Shape &s);
+    AAM_Shape& operator=(double value);
+    AAM_Shape operator+(const AAM_Shape &s);
+    AAM_Shape& operator+=(const AAM_Shape &s);
+    AAM_Shape operator-(const AAM_Shape &s);
+    AAM_Shape& operator-=(const AAM_Shape &s);
+    AAM_Shape operator*(double value);
+    AAM_Shape& operator*=(double value);
+    double operator*(const AAM_Shape &s);
+    AAM_Shape operator/(double value);
+    AAM_Shape& operator/=(double value);
+    bool operator==(double value);
 
-    void    clear()
-    {
+    void clear() {
         resize(0);
     }
-    void    resize(int length)
-    {
+
+    void resize(int length) {
         m_vPoint.resize(length);
     }
 
-    void print()const
-    {
+    void print() const {
         int i, size = NPoints();
         for(i = 0 ; i < size; i++)
             printf("%3.1f ", m_vPoint[i].x);
@@ -84,59 +79,57 @@ public:
         printf("\n");
     }
 
-    void	Read(std::ifstream& is);
-    void	Write(std::ofstream& os);
-    bool	ReadAnnotations(const std::string &filename);
-    void    ReadASF(const std::string &filename);
-    void	ReadPTS(const std::string &filename);
+    void Read(std::ifstream& is);
+    void Write(std::ofstream& os);
+    bool ReadAnnotations(const std::string &filename);
+    void ReadASF(const std::string &filename);
+    void ReadPTS(const std::string &filename);
 
     const double  MinX()const;
     const double  MinY()const;
     const double  MaxX()const;
     const double  MaxY()const;
-    inline const double  GetWidth()const
-    {
+    inline const double  GetWidth() const {
         return MaxX()-MinX();
     }
-    inline const double  GetHeight()const
-    {
+    inline const double  GetHeight() const {
         return MaxY()-MinY();
     }
 
     // Transformations
-    void    COG(double &x, double &y)const;
-    void    Centralize();
-    void    Translate(double x, double y);
-    void    Scale(double s);
-    void    Rotate(double theta);
-    void    ScaleXY(double sx, double sy);
+    void COG(double &x, double &y)const;
+    void Centralize();
+    void Translate(double x, double y);
+    void Scale(double s);
+    void Rotate(double theta);
+    void ScaleXY(double sx, double sy);
     double	Normalize();
 
     // Align the shapes to reference shape
     //													[a -b Tx]
     // returns the similarity transform: T(a,b,tx,ty) = [b  a Ty]
     //													[0  0  1]
-    void    AlignTransformation(const AAM_Shape &ref,
+    void AlignTransformation(const AAM_Shape &ref,
                                 double &a, double &b, double &tx, double &ty)const;
 
     // Align the shapes to reference shape as above, but no returns
-    void    AlignTo(const AAM_Shape &ref);
+    void AlignTo(const AAM_Shape &ref);
 
     // Transform Shape using similarity transform T(a,b,tx,ty)
-    void    TransformPose(double a, double b, double tx, double ty);
+    void TransformPose(double a, double b, double tx, double ty);
 
     // Euclidean norm
-    double  GetNorm2()const;
+    double GetNorm2()const;
 
     // conversion between CvMat and AAM_Shape
-    void    Mat2Point(const CvMat* res);
-    void    Point2Mat(CvMat* res)const;
+    void Mat2Point(const CvMat* res);
+    void Point2Mat(CvMat* res)const;
 
-    void	Sketch(IplImage* image);
+    void Sketch(IplImage* image);
 
 private:
-    void    CopyData(const AAM_Shape &s);
-    void    Transform(double c00, double c01, double c10, double c11);
+    void CopyData(const AAM_Shape &s);
+    void Transform(double c00, double c01, double c10, double c11);
 
 };
 

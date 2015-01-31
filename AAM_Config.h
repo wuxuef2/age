@@ -1,28 +1,26 @@
 #ifndef AAM_CONFIG_H
 #define AAM_CONFIG_H
 /**
- * 0: Normal
- * 1: Cannot Read Uploaded Image
- * 2: Not Find Face
- * 3: SystemBusy
- * 4: Age Input Error
- * 5:
+ * Exception
  */
- static int processState = 0;
  static char* resultPath = NULL;
 
  class AgingException {
  public:
     AgingException() {
         stateCode = 0;
+        init();
+    }
+
+    void init() {
         messageSet[0] = "Normal";
         messageSet[1] = "Cannot Read Uploaded Image";
         messageSet[2] = "Not Find Face";
         messageSet[3] = "System Busy";
         messageSet[4] = "Age Input Error";
-        messageSet[5] = "";
-        messageSet[6] = "";
-        messageSet[7] = "";
+        messageSet[5] = "Shapes != Images";
+        messageSet[6] = "Age error!";
+        messageSet[7] = "The image channels must be 3, and the depth must be 8!";
         messageSet[8] = "";
         messageSet[9] = "";
         messageSet[10] = "";
@@ -31,18 +29,7 @@
 
     AgingException(int stateCode) {
         this->stateCode = stateCode;
-        messageSet[0] = "Normal";
-        messageSet[1] = "Cannot Read Uploaded Image";
-        messageSet[2] = "Not Find Face";
-        messageSet[3] = "System Busy";
-        messageSet[4] = "Age Input Error";
-        messageSet[5] = "";
-        messageSet[6] = "";
-        messageSet[7] = "";
-        messageSet[8] = "";
-        messageSet[9] = "";
-        messageSet[10] = "";
-        messageSet[11] = "";
+        init();
     }
 
     void setStateCode(int stateCode) {
