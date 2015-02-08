@@ -28,28 +28,22 @@ std::string resultDir = "./trainingSets/";
 std::string trainDir = "./trainingSets/";
 //std::string resultDir = "../test2/";
 
-static void usage()
-{
-	printf("AAMFitting int string int int\n"
-		"---- int:		0:search shape by aam, 1:read shape from file"
-		"---- string:	image file\n"
-		"---- int:		current age group\n"
-		"---- int:		predicted age group\n");
-		//"Group0:[0,1), Group1:[1,2), Group2:[2,3), Group3:[3,6), Group4:[6,10), Group5:[10,18]";
-		//"Group0:[0,2), Group1:[2,4), Group2:[4,6), Group3:[6,10), Group4:[10,15), Group5:[15,20), Group6:[20, 30), Group7: [30, 40), Group8: [40, 68) ";
-	exit(0);
+AAM_Shape makeShape(int points[], int sizes) {
+    AAM_Shape Shape(points, sizes);
+    return Shape;
 }
 
 extern "C"
 {
-    int fit(char* originalImageFileName, char* curAge, char* predictAge, char* ResultsSavePath) {
+    int fit(char* originalImageFileName, char* curAge, char* predictAge, char* ResultsSavePath, int points[], int sizes) {
         int processState = 0;
         try {
-
-
+            IplImage* originalImage = cvLoadImage(originalImageFileName, 1);
             IplImage *image = cvCreateImage(cvGetSize(originalImage), originalImage->depth, originalImage->nChannels);
 
+            AAM_Shape Shape = makeShape(points, sizes);
 
+            AAM *aam = NULL;
             //do image alignment
             aam->Fit(image, Shape, 30, false);  //if true, show process
 
@@ -58,34 +52,6 @@ extern "C"
             outfile.open(wuxuefTmpResultDir.c_str());
             Shape.Write(outfile);
             outfile.close();
-
-            //
-            // show face detect result
-            //cvNamedWindow("AAMFitting", CV_WINDOW_AUTOSIZE);
-            //aam->Draw(image, 0);
-            //cvShowImage("AAMFitting", image);
-            //cvWaitKey(0);
-            //}
-
-            /*
-            else {
-                //read shape from file
-                std::string filename = std::string(argv[2]);
-                filename = filename.substr(0, filename.length()-3) + "pts";
-                Shape.ReadPTS(filename);
-
-                if (argc == 9) {
-                    //read father's shape
-                    std::string filenameF = std::string(argv[5]);
-                    filenameF = filenameF.substr(0, filenameF.length()-3) + "pts";
-                    ShapeF.ReadPTS(filenameF);
-
-                    //read mother's shape
-                    std::string filenameM = std::string(argv[7]);
-                    filenameM = filenameM.substr(0, filenameM.length()-3) + "pts";
-                    ShapeM.ReadPTS(filenameM);
-                }
-            }*/
 
             //resize the current image
             cvSetImageROI(originalImage, cvRect(Shape.MinX(), Shape.MinY(), Shape.GetWidth(), Shape.GetHeight()));
@@ -149,9 +115,10 @@ extern "C"
         return processState;
     }
 
-    int* getShape(char* originalImageFileName) {
+    int* getShape(char* originalImageFileName, char* curAge) {
         AAM_Shape Shape;
         int* points;
+        int processState;
 
         try {
             //load image
@@ -188,16 +155,18 @@ extern "C"
 
             //detect face for intialization
             Shape = fjdetect.Detect(image, aam->GetMeanShape());
-            int sizes = Shape.NPoints();
-            int* points = new int[sizes * 2];
+            int sizes = Shape.NPoints() * 2;
+            points = new int[sizes];
+            int index = 0;
             for (int i = 0; i < sizes; i += 2) {
-                points[i] = Shape[i].x;
-                points[i + 1] = Shape[i].y;
+                index = i > 1;
+                points[i] = Shape[index].x;
+                points[i + 1] = Shape[index].y;
             }
         }
         catch (AgingException ex) {
             processState = ex.getStateCode();
-            points = new int[sizes * 2];
+            points = new int[68 * 2];
             points[0] = 0 - processState;
         }
 
@@ -205,18 +174,22 @@ extern "C"
     }
 }
 
-Shape makeShape() {
-
-}
-
 
 int main() {
     char* originalImageFileName = "input.jpg";
-	char* curAge = "9";
+	char* curAge = "1";
 	char* predictAge = "3";
 	char* ResultsSavePath = "ResultsSavePath";
 
-    cout << fit(originalImageFileName, curAge, predictAge, ResultsSavePath) << endl;
+    try {
+        int* points = getShape(originalImageFileName, curAge);
+        int sizes = 68 * 2;
+        int state = fit(originalImageFileName, curAge, predictAge, ResultsSavePath, points, sizes);
+        cout << state << endl;
+    }
+    catch (AgingException ex) {
+        cout << ex.getStateCode() << endl;
+    }
     system("pause");
     return 0;
 }

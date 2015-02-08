@@ -33,6 +33,16 @@ public:
         clear();
     }
 
+    AAM_Shape(int points[], int len) {
+        CvPoint2D32f pnt;
+        m_vPoint.clear();
+        for (int i = 0; i < len; i += 2) {
+            pnt.x = points[i];
+            pnt.y = points[i + 1];
+            m_vPoint.push_back(pnt);
+        }
+    }
+
     //access elements
     const CvPoint2D32f operator[] (int i)const {
         return m_vPoint[i];
