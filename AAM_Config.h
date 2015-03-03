@@ -3,7 +3,7 @@
 /**
  * Exception
  */
- static char* resultPath = NULL;
+ //static char* resultPath = NULL;
 
  class AgingException {
  public:
@@ -13,7 +13,7 @@
     }
 
     void init() {
-        messageSet[0] = "Normal";
+/*        messageSet[0] = "Normal";
         messageSet[1] = "Cannot Read Uploaded Image";
         messageSet[2] = "Not Find Face";
         messageSet[3] = "System Busy";
@@ -24,7 +24,7 @@
         messageSet[8] = "";
         messageSet[9] = "";
         messageSet[10] = "";
-        messageSet[11] = "";
+        messageSet[11] = "";*/
     }
 
     AgingException(int stateCode) {

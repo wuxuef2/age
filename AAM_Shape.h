@@ -33,7 +33,7 @@ public:
         clear();
     }
 
-    AAM_Shape(int points[], int len) {
+    AAM_Shape(double points[], int len) {
         CvPoint2D32f pnt;
         m_vPoint.clear();
         for (int i = 0; i < len; i += 2) {
@@ -80,6 +80,7 @@ public:
 
     void print() const {
         int i, size = NPoints();
+        printf("%d\n", size);
         for(i = 0 ; i < size; i++)
             printf("%3.1f ", m_vPoint[i].x);
         printf("\n");

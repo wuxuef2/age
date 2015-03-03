@@ -105,7 +105,7 @@ void AAM_CAM::Train(const std::vector<AAM_Shape>& AllShapes,
 
     int np = __AppearanceEigenVectors->rows;
 
-    printf("Extracting shape and texture part of combined eigenvectors...\n",np);
+    printf("Extracting shape and texture part of combined eigenvectors...\n");
 
     // extract the shape part of the combined eigen vectors
     CvMat Ps;

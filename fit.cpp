@@ -28,14 +28,15 @@ std::string resultDir = "./trainingSets/";
 std::string trainDir = "./trainingSets/";
 //std::string resultDir = "../test2/";
 
-AAM_Shape makeShape(int points[], int sizes) {
+
+AAM_Shape makeShape(double points[], int sizes) {
     AAM_Shape Shape(points, sizes);
     return Shape;
 }
 
 extern "C"
 {
-    int fit(char* originalImageFileName, char* curAge, char* predictAge, char* ResultsSavePath, int points[], int sizes) {
+    int fit(char* originalImageFileName, char* curAge, char* predictAge, char* ResultsSavePath, double points[], int sizes) {
         int processState = 0;
         try {
             IplImage* originalImage = cvLoadImage(originalImageFileName, 1);
@@ -43,7 +44,76 @@ extern "C"
 
             AAM_Shape Shape = makeShape(points, sizes);
 
+            //Facial Prediction
+            FacePredict face_predict;
+            std::string mfile = resultDir + "facial.predict_model";
+            std::ifstream model(mfile.c_str());
+            face_predict.Read(model);
+            model.close();
+            //IplImage* newImage = face_predict.predict(Shape, *originalImage, ShapeF, *ImageF, ratioF, ShapeM, *ImageM, ratioM, atoi(argv[3]), atoi(argv[4]), false);
+
+
+            IplImage* newImage = face_predict.predict(Shape, *originalImage, atoi(curAge), atoi(predictAge), true);
+            std::string newfile = std::string(originalImageFileName);
+            newfile = newfile.insert(newfile.find_last_of('/')+1, "result_" );
+            newfile = newfile.insert(newfile.find_last_of('.'), std::string("_G" + string(predictAge)));
+            cvSaveImage(newfile.c_str(), newImage);
+
+            cvNamedWindow("PredictedFacialImage");
+            cvShowImage("PredictedFacialImage", newImage);
+            cvWaitKey(0);
+
+            cvReleaseImage(&image);
+        }
+        catch (AgingException ex) {
+            processState = ex.getStateCode();
+        }
+
+        return processState;
+    }
+
+    double* getShape(char* originalImageFileName, char* curAge) {
+        AAM_Shape Shape;
+        double* points;
+        int processState = 0;
+
+        try {
+            //load image
+            IplImage* originalImage = cvLoadImage(originalImageFileName, 1);
+            if (originalImage == 0) {
+                AgingException agingException(1);
+                throw agingException;
+            }
+
+            IplImage *image = cvCreateImage(cvGetSize(originalImage), originalImage->depth, originalImage->nChannels);
+            cvCopy(originalImage, image);
+            AAM_Shape Shape;
+
             AAM *aam = NULL;
+            int type;
+            std::string aamFileName = resultDir + "Group" + /*std::string(argv[3])*/curAge + ".aam_ic";
+            std::ifstream fs(aamFileName.c_str());
+            if(fs == 0) {
+                AgingException agingException(3);
+                throw agingException;
+            }
+            fs >> type;
+
+            //aam-basic
+            if(type == 0)		aam = new AAM_Basic;
+            else if(type == 1)  aam = new AAM_IC;
+
+            //read model from file
+            aam->Read(fs);
+            fs.close();
+
+            //intial face detector
+            AAM_VJFaceDetect fjdetect;
+            fjdetect.LoadCascade("haarcascade_frontalface_alt2.xml");
+
+            //detect face for intialization
+            Shape = fjdetect.Detect(image, aam->GetMeanShape());
+
             //do image alignment
             aam->Fit(image, Shape, 30, false);  //if true, show process
 
@@ -52,6 +122,16 @@ extern "C"
             outfile.open(wuxuefTmpResultDir.c_str());
             Shape.Write(outfile);
             outfile.close();
+
+
+            // show face detect result
+            cvNamedWindow("AAMFitting", CV_WINDOW_AUTOSIZE);
+            aam->Draw(image, 0);
+            cvShowImage("AAMFitting", image);
+            cvWaitKey(0);
+            //}
+
+
 
             //resize the current image
             cvSetImageROI(originalImage, cvRect(Shape.MinX(), Shape.MinY(), Shape.GetWidth(), Shape.GetHeight()));
@@ -87,86 +167,19 @@ extern "C"
             cvReleaseImage(&shapeImg);
 
 
-            //Facial Prediction
-            FacePredict face_predict;
-            std::string mfile = resultDir + "facial.predict_model";
-            std::ifstream model(mfile.c_str());
-            face_predict.Read(model);
-            model.close();
-            //IplImage* newImage = face_predict.predict(Shape, *originalImage, ShapeF, *ImageF, ratioF, ShapeM, *ImageM, ratioM, atoi(argv[3]), atoi(argv[4]), false);
 
-
-            IplImage* newImage = face_predict.predict(Shape, *originalImage, atoi(curAge), atoi(predictAge), true);
-            std::string newfile = std::string(originalImageFileName);
-            newfile = newfile.insert(newfile.find_last_of('/')+1, "result_" );
-            newfile = newfile.insert(newfile.find_last_of('.'), std::string("_G" + string(predictAge)));
-            cvSaveImage(newfile.c_str(), newImage);
-
-            cvNamedWindow("PredictedFacialImage");
-            cvShowImage("PredictedFacialImage", newImage);
-            cvWaitKey(0);
-
-            cvReleaseImage(&image);
-        }
-        catch (AgingException ex) {
-            processState = ex.getStateCode();
-        }
-
-        return processState;
-    }
-
-    int* getShape(char* originalImageFileName, char* curAge) {
-        AAM_Shape Shape;
-        int* points;
-        int processState;
-
-        try {
-            //load image
-            IplImage* originalImage = cvLoadImage(originalImageFileName, 1);
-            if (originalImage == 0) {
-                AgingException ex(1);
-                throw ex;
-            }
-
-            IplImage *image = cvCreateImage(cvGetSize(originalImage), originalImage->depth, originalImage->nChannels);
-            cvCopy(originalImage, image);
-
-            AAM *aam = NULL;
-            int type;
-            std::string aamFileName = resultDir + "Group" + curAge + ".aam_ic";
-            std::ifstream fs(aamFileName.c_str());
-            if(fs == 0) {
-                AgingException ex(3);
-                throw ex;
-            }
-            fs >> type;
-
-            //aam-basic
-            if(type == 0)		aam = new AAM_Basic;
-            else if(type == 1)  aam = new AAM_IC;
-
-            //read model from file
-            aam->Read(fs);
-            fs.close();
-
-            //intial face detector
-            AAM_VJFaceDetect fjdetect;
-            fjdetect.LoadCascade("haarcascade_frontalface_alt2.xml");
-
-            //detect face for intialization
-            Shape = fjdetect.Detect(image, aam->GetMeanShape());
             int sizes = Shape.NPoints() * 2;
-            points = new int[sizes];
+            points = new double[sizes];
             int index = 0;
             for (int i = 0; i < sizes; i += 2) {
-                index = i > 1;
+                index = i / 2;
                 points[i] = Shape[index].x;
                 points[i + 1] = Shape[index].y;
             }
         }
         catch (AgingException ex) {
             processState = ex.getStateCode();
-            points = new int[68 * 2];
+            points = new double[68 * 2];
             points[0] = 0 - processState;
         }
 
@@ -182,14 +195,23 @@ int main() {
 	char* ResultsSavePath = "ResultsSavePath";
 
     try {
-        int* points = getShape(originalImageFileName, curAge);
+        double* points = getShape(originalImageFileName, curAge);
         int sizes = 68 * 2;
+/*
+            for (int i = 0; i < sizes; i++) {
+                printf("(%ld:%lf) ", i, points[i]);
+                if ((i + 1) % 10 == 0) {
+                    printf("\n");
+                }
+            }
+            printf("\n---------------ddddddddddddddddddddd------------\n");
+            printf("%lf", points[135]);*/
         int state = fit(originalImageFileName, curAge, predictAge, ResultsSavePath, points, sizes);
         cout << state << endl;
     }
     catch (AgingException ex) {
         cout << ex.getStateCode() << endl;
     }
-    system("pause");
+
     return 0;
 }
