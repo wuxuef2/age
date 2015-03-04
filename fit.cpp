@@ -36,7 +36,7 @@ AAM_Shape makeShape(double points[], int sizes) {
 
 extern "C"
 {
-    int fit(char* originalImageFileName, char* curAge, char* predictAge, char* ResultsSavePath, double points[], int sizes) {
+    int fit(char* originalImageFileName, char* curAge, char* predictAge, double points[], int sizes) {
         int processState = 0;
         try {
             IplImage* originalImage = cvLoadImage(originalImageFileName, 1);
@@ -50,12 +50,10 @@ extern "C"
             std::ifstream model(mfile.c_str());
             face_predict.Read(model);
             model.close();
-            //IplImage* newImage = face_predict.predict(Shape, *originalImage, ShapeF, *ImageF, ratioF, ShapeM, *ImageM, ratioM, atoi(argv[3]), atoi(argv[4]), false);
-
 
             IplImage* newImage = face_predict.predict(Shape, *originalImage, atoi(curAge), atoi(predictAge), true);
             std::string newfile = std::string(originalImageFileName);
-            newfile = newfile.insert(newfile.find_last_of('/')+1, "result_" );
+            newfile = newfile.insert(newfile.find_last_of('/') + 1, "result_" );
             newfile = newfile.insert(newfile.find_last_of('.'), std::string("_G" + string(predictAge)));
             cvSaveImage(newfile.c_str(), newImage);
 
@@ -125,10 +123,10 @@ extern "C"
 
 
             // show face detect result
-            cvNamedWindow("AAMFitting", CV_WINDOW_AUTOSIZE);
-            aam->Draw(image, 0);
-            cvShowImage("AAMFitting", image);
-            cvWaitKey(0);
+            //cvNamedWindow("AAMFitting", CV_WINDOW_AUTOSIZE);
+            //aam->Draw(image, 0);
+            //cvShowImage("AAMFitting", image);
+            //cvWaitKey(0);
             //}
 
 
@@ -145,9 +143,9 @@ extern "C"
             IplImage *stdImage = cvCreateImage(stdsize, originalImage->depth, originalImage->nChannels);
             cvResize(facialImage, stdImage, CV_INTER_LINEAR);
 
-            cvNamedWindow("CurrentFacialImage");
-            cvShowImage("CurrentFacialImage", stdImage);
-
+            //cvNamedWindow("CurrentFacialImage");
+            //cvShowImage("CurrentFacialImage", stdImage);
+            //cvWaitKey(0);
 
             //draw the shape
             CvSize ssize;
@@ -197,7 +195,7 @@ int main() {
     try {
         double* points = getShape(originalImageFileName, curAge);
         int sizes = 68 * 2;
-/*
+
             for (int i = 0; i < sizes; i++) {
                 printf("(%ld:%lf) ", i, points[i]);
                 if ((i + 1) % 10 == 0) {
@@ -205,8 +203,8 @@ int main() {
                 }
             }
             printf("\n---------------ddddddddddddddddddddd------------\n");
-            printf("%lf", points[135]);*/
-        int state = fit(originalImageFileName, curAge, predictAge, ResultsSavePath, points, sizes);
+            printf("%lf", points[135]);
+        int state = fit(originalImageFileName, curAge, predictAge, points, sizes);
         cout << state << endl;
     }
     catch (AgingException ex) {
@@ -215,3 +213,4 @@ int main() {
 
     return 0;
 }
+
