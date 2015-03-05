@@ -49,11 +49,6 @@ extern "C"
             pch = strtok(NULL, " ");
         }
 
-        for (int i = 0; i < index; i++) {
-            printf("%lf\t", points[i]);
-        }
-
-
         try {
             IplImage* originalImage = cvLoadImage(originalImageFileName, 1);
             IplImage *image = cvCreateImage(cvGetSize(originalImage), originalImage->depth, originalImage->nChannels);
@@ -67,15 +62,16 @@ extern "C"
             face_predict.Read(model);
             model.close();
 
-            IplImage* newImage = face_predict.predict(Shape, *originalImage, atoi(curAge), atoi(predictAge), true);
+            IplImage* newImage = face_predict.predict(Shape, *originalImage, atoi(curAge), atoi(predictAge), false);
             std::string newfile = std::string(originalImageFileName);
-            newfile = newfile.insert(newfile.find_last_of('/') + 1, "result_" );
-            newfile = newfile.insert(newfile.find_last_of('.'), std::string("_G" + string(predictAge)));
+            newfile = newfile.insert(newfile.find_last_of('/') + 1, "result_");
+            //newfile = newfile.insert(newfile.find_last_of('.'), std::string("_G" + string(predictAge)));
             cvSaveImage(newfile.c_str(), newImage);
 
+            /*
             cvNamedWindow("PredictedFacialImage");
             cvShowImage("PredictedFacialImage", newImage);
-            cvWaitKey(0);
+            cvWaitKey(0);*/
 
             cvReleaseImage(&image);
         }
