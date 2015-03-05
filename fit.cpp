@@ -15,6 +15,7 @@
 #include <string>
 #include <opencv/highgui.h>
 #include <string.h>
+#include <stdlib.h>
 
 #include "AAM_IC.h"
 #include "AAM_Basic.h"
@@ -36,8 +37,23 @@ AAM_Shape makeShape(double points[], int sizes) {
 
 extern "C"
 {
-    int fit(char* originalImageFileName, char* curAge, char* predictAge, double points[], int sizes) {
+    int fit(char* originalImageFileName, char* curAge, char* predictAge, char* pointsStr, int sizes) {
         int processState = 0;
+        char* pch;
+        double* points = new double[sizes];
+
+        int index = 0;
+        pch = strtok(pointsStr, " ");
+        while (pch != NULL) {
+            points[index++] = atof(pch);
+            pch = strtok(NULL, " ");
+        }
+
+        for (int i = 0; i < index; i++) {
+            printf("%lf\t", points[i]);
+        }
+
+
         try {
             IplImage* originalImage = cvLoadImage(originalImageFileName, 1);
             IplImage *image = cvCreateImage(cvGetSize(originalImage), originalImage->depth, originalImage->nChannels);
@@ -185,7 +201,7 @@ extern "C"
     }
 }
 
-
+/*
 int main() {
     char* originalImageFileName = "input.jpg";
 	char* curAge = "1";
@@ -195,16 +211,21 @@ int main() {
     try {
         double* points = getShape(originalImageFileName, curAge);
         int sizes = 68 * 2;
+        char buffer[68 * 2 * 11];
 
-            for (int i = 0; i < sizes; i++) {
-                printf("(%ld:%lf) ", i, points[i]);
-                if ((i + 1) % 10 == 0) {
-                    printf("\n");
-                }
-            }
-            printf("\n---------------ddddddddddddddddddddd------------\n");
-            printf("%lf", points[135]);
-        int state = fit(originalImageFileName, curAge, predictAge, points, sizes);
+        char* ptr = buffer;
+
+        for (int i = 0; i < sizes; i++) {
+            memcpy(ptr, points + i, sizeof(points[i]));
+            ptr += sizeof(points[i]) + 1;
+            *ptr = ' ';
+            ptr++;
+        }
+
+
+        printf("%s\n", buffer);
+
+        int state = fit(originalImageFileName, curAge, predictAge, buffer, sizes);
         cout << state << endl;
     }
     catch (AgingException ex) {
@@ -213,4 +234,4 @@ int main() {
 
     return 0;
 }
-
+*/

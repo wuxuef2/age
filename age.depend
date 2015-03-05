@@ -110,11 +110,12 @@
 	"AAM_PDM.h"
 	"AAM_TDM.h"
 
-1425383962 source:/home/wuxuef/myproject/age/fit.cpp
+1425541972 source:/home/wuxuef/myproject/age/fit.cpp
 	<cstdio>
 	<string>
 	<opencv/highgui.h>
 	<string.h>
+	<stdlib.h>
 	"AAM_IC.h"
 	"AAM_Basic.h"
 	"AAM_VJFaceDetect.h"
